@@ -1,30 +1,26 @@
 package si.fri.rso.navigationmicroservice.models.entities;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 @Entity
-@Table(name = "addresses")
+@Table(name = "navigations")
 @NamedQueries(value = {
         @NamedQuery(name = "NavigationEntity.getAll", query = "SELECT im FROM NavigationEntity im")
 })
-public class NavigationEntity {//should be ok
+public class NavigationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "sender")
-    private String sender;
+    @Column(name = "deliveryId")
+    private Integer deliveryId;
 
-    @Column(name = "receiver")
-    private String receiver;
+    @Column(name = "distance")
+    private String distance;
 
-    @Column(name = "sentOn")
-    private String sentOn;
-
-    @Column(name = "deliveredOn")
-    private String deliveredOn;
+    @Column(name = "time")
+    private String time;
 
     public Integer getId() {
         return id;
@@ -34,35 +30,27 @@ public class NavigationEntity {//should be ok
         this.id = id;
     }
 
-    public String getSender() {
-        return sender;
+    public Integer getDeliveryId() {
+        return deliveryId;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setDeliveryId(Integer deliveryId) {
+        this.deliveryId = deliveryId;
     }
 
-    public String getReceiver() {
-        return receiver;
+    public String getDistance() {
+        return distance;
     }
 
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
+    public void setDistance(String distance) {
+        this.distance = distance;
     }
 
-    public String getSentOn() {
-        return sentOn;
+    public String getTime() {
+        return time;
     }
 
-    public void setSentOn(String sentOn) {
-        this.sentOn = sentOn;
-    }
-
-    public String getDeliveredOn() {
-        return deliveredOn;
-    }
-
-    public void setDeliveredOn(String deliveredOn) {
-        this.deliveredOn = deliveredOn;
+    public void setTime(String time) {
+        this.time = time;
     }
 }

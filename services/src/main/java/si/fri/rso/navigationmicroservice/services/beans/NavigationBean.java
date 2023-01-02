@@ -10,23 +10,28 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.google.maps.model.DistanceMatrixElement;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
 
 import si.fri.rso.navigationmicroservice.lib.Navigation;
+import si.fri.rso.navigationmicroservice.lib.NavigationDto;
 import si.fri.rso.navigationmicroservice.models.converters.NavigationConverter;
 import si.fri.rso.navigationmicroservice.models.entities.NavigationEntity;
-
+import si.fri.rso.navigationmicroservice.services.clients.GoogleMapsApi;
 
 @RequestScoped
-public class NavigationBean {//should be ok
+public class NavigationBean {
 
     private Logger log = Logger.getLogger(NavigationBean.class.getName());
 
     @Inject
     private EntityManager em;
 
-    public List<Navigation> getAddresses() {
+    @Inject
+    private GoogleMapsApi googleMapsApi;
+
+    public List<Navigation> getNavigations() {
 
         TypedQuery<NavigationEntity> query = em.createNamedQuery(
                 "NavigationEntity.getAll", NavigationEntity.class);
@@ -37,7 +42,7 @@ public class NavigationBean {//should be ok
 
     }
 
-    public List<Navigation> getAddressFilter(UriInfo uriInfo) {
+    public List<Navigation> getNavigationFilter(UriInfo uriInfo) {
 
         QueryParameters queryParameters = QueryParameters.query(uriInfo.getRequestUri().getQuery()).defaultOffset(0)
                 .build();
@@ -46,7 +51,7 @@ public class NavigationBean {//should be ok
                 .map(NavigationConverter::toDto).collect(Collectors.toList());
     }
 
-    public Navigation getAddresses(Integer id) {
+    public Navigation getNavigation(Integer id) {
 
         NavigationEntity navigationEntity = em.find(NavigationEntity.class, id);
 
@@ -59,16 +64,30 @@ public class NavigationBean {//should be ok
         return item;
     }
 
-    public Navigation createItem(Navigation item) {
+    public Navigation createNavigation(NavigationDto navigationDto) {
+        String[] origins = { navigationDto.getOrigin() };
+        String[] destinations = { navigationDto.getDestination() };
 
-        NavigationEntity navigationEntity = NavigationConverter.toEntity(item);
+        // We only use one origin and destination
+        List<DistanceMatrixElement[]> matrixElements = googleMapsApi.getDistanceMatrixData(origins, destinations);
+        DistanceMatrixElement[] distanceMatrixElements = matrixElements.get(0);
 
+        NavigationEntity navigationEntity = new NavigationEntity();
+        navigationEntity.setDeliveryId(navigationDto.getDeliveryId());
+        navigationEntity.setDistance(distanceMatrixElements[0].distance.toString());
+        navigationEntity.setTime(distanceMatrixElements[0].duration.toString());
+
+        this.persistNavigation(navigationEntity);
+
+        return NavigationConverter.toDto(navigationEntity);
+    }
+
+    public Navigation persistNavigation(NavigationEntity navigationEntity) {
         try {
             beginTx();
             em.persist(navigationEntity);
             commitTx();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             rollbackTx();
         }
 
@@ -77,50 +96,6 @@ public class NavigationBean {//should be ok
         }
 
         return NavigationConverter.toDto(navigationEntity);
-    }
-
-    public Navigation putItem(Integer id, Navigation item) {
-
-        NavigationEntity c = em.find(NavigationEntity.class, id);
-
-        if (c == null) {
-            return null;
-        }
-
-        NavigationEntity updatedNavigationEntity = NavigationConverter.toEntity(item);
-
-        try {
-            beginTx();
-            updatedNavigationEntity.setId(c.getId());
-            updatedNavigationEntity = em.merge(updatedNavigationEntity);
-            commitTx();
-        }
-        catch (Exception e) {
-            rollbackTx();
-        }
-
-        return NavigationConverter.toDto(updatedNavigationEntity);
-    }
-
-    public boolean deleteItem(Integer id) {
-
-        NavigationEntity navigationEntity = em.find(NavigationEntity.class, id);
-
-        if (navigationEntity != null) {
-            try {
-                beginTx();
-                em.remove(navigationEntity);
-                commitTx();
-            }
-            catch (Exception e) {
-                rollbackTx();
-            }
-        }
-        else {
-            return false;
-        }
-
-        return true;
     }
 
     private void beginTx() {

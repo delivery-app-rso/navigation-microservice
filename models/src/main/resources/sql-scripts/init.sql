@@ -1,1 +1,1 @@
-INSERT INTO addresses(sender, receiver,  sentOn, deliveredOn) VALUES('Ana Novak, Večna pot 113, 1000 Ljubljana', 'UL, Kongresni trg 12, 1000 Ljubljana', '2.12.2022', '6.12.2022');
+INSERT INTO navigations(deliveryId, distance, time) VALUES(1, '10km', '1 hour 54 mins');

@@ -10,6 +10,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import si.fri.rso.navigationmicroservice.lib.Navigation;
+import si.fri.rso.navigationmicroservice.lib.NavigationDto;
 import si.fri.rso.navigationmicroservice.services.beans.NavigationBean;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -26,7 +27,7 @@ import java.util.logging.Logger;
 @Path("/navigation")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class NavigationResource {//should be ok
+public class NavigationResource {
 
         private Logger log = Logger.getLogger(NavigationResource.class.getName());
 
@@ -36,27 +37,27 @@ public class NavigationResource {//should be ok
         @Context
         protected UriInfo uriInfo;
 
-        @Operation(description = "Get all destinations.", summary = "Get all destinations")
+        @Operation(description = "Get all navigations.", summary = "Get all navigations")
         @APIResponses({
-                        @APIResponse(responseCode = "200", description = "List of addresses", content = @Content(schema = @Schema(implementation = Navigation.class, type = SchemaType.ARRAY)), headers = {
+                        @APIResponse(responseCode = "200", description = "List of navigations", content = @Content(schema = @Schema(implementation = Navigation.class, type = SchemaType.ARRAY)), headers = {
                                         @Header(name = "X-Total-Count", description = "Number of objects in list") }) })
         @GET
-        public Response getAddresses() {
+        public Response getNavigations() {
 
-                List<Navigation> navigationMetadata = navigationBean.getAddressFilter(uriInfo);
+                List<Navigation> navigationMetadata = navigationBean.getNavigationFilter(uriInfo);
 
                 return Response.status(Response.Status.OK).entity(navigationMetadata).build();
         }
 
-        @Operation(description = "Get address.", summary = "Get address")
+        @Operation(description = "Get navigation by delivery id.", summary = "Get navigation")
         @APIResponses({
                         @APIResponse(responseCode = "200", description = "Address data", content = @Content(schema = @Schema(implementation = Navigation.class))) })
         @GET
-        @Path("/{addressId}")
-        public Response getItem(
-                        @Parameter(description = "user ID.", required = true) @PathParam("addressId") Integer addressId) {
+        @Path("/{deliveryId}")
+        public Response getNavigation(
+                        @Parameter(description = "user ID.", required = true) @PathParam("navigationId") Integer navigationId) {
 
-                Navigation item = navigationBean.getAddresses(addressId);
+                Navigation item = navigationBean.getNavigation(navigationId);
 
                 if (item == null) {
                         return Response.status(Response.Status.NOT_FOUND).build();
@@ -65,62 +66,23 @@ public class NavigationResource {//should be ok
                 return Response.status(Response.Status.OK).entity(item).build();
         }
 
-        @Operation(description = "Add address.", summary = "Add address")
+        @Operation(description = "Add navigation.", summary = "Add navigation")
         @APIResponses({
-                        @APIResponse(responseCode = "201", description = "Address successfully added."),
+                        @APIResponse(responseCode = "201", description = "Navigation successfully added."),
                         @APIResponse(responseCode = "405", description = "Validation error .")
         })
         @POST
-        public Response createItem(
-                        @RequestBody(description = "DTO object with item data.", required = true, content = @Content(schema = @Schema(implementation = Navigation.class))) Navigation item) {
-
-                if ((item.getSender() == null || item.getReceiver() == null) || item.getSentOn() == null || item.getDeliveredOn() == null) {
+        public Response createNavigation(
+                        @RequestBody(description = "DTO object with navigation data.", required = true, content = @Content(schema = @Schema(implementation = NavigationDto.class))) NavigationDto navigationDto) {
+                System.out.println("we here boss");
+                if ((navigationDto.getDeliveryId() == null || navigationDto.getDestination() == null)
+                                || navigationDto.getOrigin() == null) {
                         return Response.status(Response.Status.BAD_REQUEST).build();
-                } else {
-                        item = navigationBean.createItem(item);
                 }
 
-                return Response.status(Response.Status.CONFLICT).entity(item).build();
+                Navigation navigation = navigationBean.createNavigation(navigationDto);
+
+                return Response.status(Response.Status.OK).entity(navigation).build();
 
         }
-
-        @Operation(description = "Update address.", summary = "Update address")
-        @APIResponses({
-                        @APIResponse(responseCode = "200", description = "Address successfully updated.")
-        })
-        @PUT
-        @Path("{addressId}")
-        public Response putUser(
-                        @Parameter(description = "Address ID.", required = true) @PathParam("addressId") Integer addressId,
-                        @RequestBody(description = "DTO object with item.", required = true, content = @Content(schema = @Schema(implementation = Navigation.class))) Navigation item) {
-
-                item = navigationBean.putItem(addressId, item);
-
-                if (item == null) {
-                        return Response.status(Response.Status.NOT_FOUND).build();
-                }
-
-                return Response.status(Response.Status.NOT_MODIFIED).build();
-
-        }
-
-        @Operation(description = "Delete address.", summary = "Delete address")
-        @APIResponses({
-                        @APIResponse(responseCode = "200", description = "Address successfully deleted."),
-                        @APIResponse(responseCode = "404", description = "Not found.")
-        })
-        @DELETE
-        @Path("{addressId}")
-        public Response deleteUser(
-                        @Parameter(description = "Address ID.", required = true) @PathParam("addressId") Integer addressId) {
-
-                boolean deleted = navigationBean.deleteItem(addressId);
-
-                if (deleted) {
-                        return Response.status(Response.Status.NO_CONTENT).build();
-                } else {
-                        return Response.status(Response.Status.NOT_FOUND).build();
-                }
-        }
-
 }

@@ -1,14 +1,14 @@
 package si.fri.rso.navigationmicroservice.lib;
 
-import java.time.Instant;
-
-public class Navigation {//should be ok
+public class Navigation {
 
     private Integer id;
-    private String sender;
-    private String receiver;
-    private String sentOn;
-    private String deliveredOn;
+
+    private Integer deliveryId;
+
+    private String distance;
+
+    private String time;
 
     public Integer getId() {
         return id;
@@ -18,35 +18,27 @@ public class Navigation {//should be ok
         this.id = id;
     }
 
-    public String getSender() {
-        return sender;
+    public Integer getDeliveryId() {
+        return deliveryId;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setDeliveryId(Integer deliveryId) {
+        this.deliveryId = deliveryId;
     }
 
-    public String getReceiver() {
-        return receiver;
+    public String getDistance() {
+        return distance;
     }
 
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
+    public void setDistance(String distance) {
+        this.distance = distance;
     }
 
-    public String getSentOn() {
-        return sentOn;
+    public String getTime() {
+        return time;
     }
 
-    public void setSentOn(String sentOn) {
-        this.sentOn = sentOn;
-    }
-
-    public String getDeliveredOn() {
-        return deliveredOn;
-    }
-
-    public void setDeliveredOn(String deliveredOn) {
-        this.deliveredOn = deliveredOn;
+    public void setTime(String time) {
+        this.time = time;
     }
 }
