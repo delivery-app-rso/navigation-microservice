@@ -51,17 +51,19 @@ public class NavigationBean {
                 .map(NavigationConverter::toDto).collect(Collectors.toList());
     }
 
-    public Navigation getNavigation(Integer id) {
+    public Navigation getNavigation(Integer deliveryId) {
+        List<NavigationEntity> resultsList = (List<NavigationEntity>) em
+                .createQuery("SELECT n FROM NavigationEntity b WHERE n.deliveryId=:deliveryId ")
+                .setParameter("deliveryId", deliveryId)
+                .getResultList();
 
-        NavigationEntity navigationEntity = em.find(NavigationEntity.class, id);
+        List<Navigation> navigation = resultsList.stream().map(NavigationConverter::toDto).collect(Collectors.toList());
 
-        if (navigationEntity == null) {
-            throw new NotFoundException();
+        if (navigation.size() == 0) {
+            return null;
         }
 
-        Navigation item = NavigationConverter.toDto(navigationEntity);
-
-        return item;
+        return navigation.get(0);
     }
 
     public Navigation createNavigation(NavigationDto navigationDto) {

@@ -60,9 +60,9 @@ public class NavigationResource {
         @GET
         @Path("/{deliveryId}")
         public Response getNavigation(
-                        @Parameter(description = "Navigation ID.", required = true) @PathParam("navigationId") Integer navigationId) {
+                        @Parameter(description = "Navigation ID.", required = true) @PathParam("deliveryId") Integer deliveryId) {
 
-                Navigation item = navigationBean.getNavigation(navigationId);
+                Navigation item = navigationBean.getNavigation(deliveryId);
 
                 if (item == null) {
                         return Response.status(Response.Status.NOT_FOUND).build();
