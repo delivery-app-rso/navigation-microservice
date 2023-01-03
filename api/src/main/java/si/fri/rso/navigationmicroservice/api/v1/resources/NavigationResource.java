@@ -51,11 +51,12 @@ public class NavigationResource {
 
         @Operation(description = "Get navigation by delivery id.", summary = "Get navigation")
         @APIResponses({
-                        @APIResponse(responseCode = "200", description = "Address data", content = @Content(schema = @Schema(implementation = Navigation.class))) })
+                        @APIResponse(responseCode = "200", description = "Address data", content = @Content(schema = @Schema(implementation = Navigation.class))),
+                        @APIResponse(responseCode = "404", description = "Not found.") })
         @GET
         @Path("/{deliveryId}")
         public Response getNavigation(
-                        @Parameter(description = "user ID.", required = true) @PathParam("navigationId") Integer navigationId) {
+                        @Parameter(description = "Navigation ID.", required = true) @PathParam("navigationId") Integer navigationId) {
 
                 Navigation item = navigationBean.getNavigation(navigationId);
 
@@ -68,8 +69,8 @@ public class NavigationResource {
 
         @Operation(description = "Add navigation.", summary = "Add navigation")
         @APIResponses({
-                        @APIResponse(responseCode = "201", description = "Navigation successfully added."),
-                        @APIResponse(responseCode = "405", description = "Validation error .")
+                        @APIResponse(responseCode = "200", description = "Navigation successfully added."),
+                        @APIResponse(responseCode = "400", description = "Bad request error.")
         })
         @POST
         public Response createNavigation(
