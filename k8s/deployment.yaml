@@ -26,31 +26,48 @@ spec:
                 secretKeyRef:
                   name: gke-rso-secrets
                   key: db_name
-            - name: KUMULUZEE_DATASOURCES0_CONNECTIONURL
-              value: jdbc:postgresql://${DB_HOST}:5432/${DB-NAME}
-            - name: KUMULUZEE_DATASOURCES0_USERNAME
+            - name: DB_USER
               valueFrom:
                 secretKeyRef:
                   name: gke-rso-secrets
                   key: db_user
-            - name: KUMULUZEE_DATASOURCES0_PASSWORD
+            - name: DB_PASS
               valueFrom:
                 secretKeyRef:
                   name: gke-rso-secrets
                   key: db_pass
+            - name: KUMULUZEE_DATASOURCES0_CONNECTIONURL
+              value: jdbc:postgresql://rso-app-db.postgres.database.azure.com:5432/${DB_NAME}?user=dbuser@rso-app-db&password=${DB_PASS}
+            - name: KUMULUZEE_DATASOURCES0_USERNAME
+              value: ${DB_USER}
+            - name: KUMULUZEE_DATASOURCES0_PASSWORD
+              value: ${DB_PASS}
+            - name: KUMULUZEE_CONFIG_CONSUL_AGENT
+              value: http://10.244.1.21:8500
+            - name: KUMULUZEE_NAME
+              value: navigation-microservice
+            - name: KUMULUZEE_ENV_NAME
+              value: dev
+            - name: KUMULUZEE_SERVER_HTTP_PORT
+              value: "8007"
+            - name: KUMULUZEE_SERVER_BASEURL
+              value: http://20.76.184.237/navigation-service/
+            - name: KUMULUZEE_OPENAPIMP_UI_SPECIFICATIONSERVER
+              value: http://20.76.184.237/navigation-service/
+            - name: KUMULUZEE_OPENAPIMP_SERVERS
+              value: http://20.76.184.237/navigation-service/
           ports:
-            - containerPort: 8080
+            - containerPort: 8007
               name: server
               protocol: TCP
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
   name: navigation-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - port: 8080
       protocol: TCP

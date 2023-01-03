@@ -48,3 +48,9 @@ kumuluzee:
       - navigation-microservice-services
       - navigation-microservice-models
       - navigation-microservice-lib
+  kumuluzee:
+    cors-filter:
+      annotations:
+        my-resource:
+          allow-origin: "*"
+          allow-subdomains: true
