@@ -53,7 +53,7 @@ public class NavigationBean {
 
     public Navigation getNavigation(Integer deliveryId) {
         List<NavigationEntity> resultsList = (List<NavigationEntity>) em
-                .createQuery("SELECT n FROM NavigationEntity b WHERE n.deliveryId=:deliveryId ")
+                .createQuery("SELECT n FROM NavigationEntity n WHERE n.deliveryId=:deliveryId ")
                 .setParameter("deliveryId", deliveryId)
                 .getResultList();
 
